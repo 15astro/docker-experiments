@@ -5,8 +5,8 @@ mysql_host = os.getenv('MYSQL_HOST', "mysql-test")
 print("MYSQL_HOST_IS:",mysql_host)
 mydb = mysql.connector.connect(
   host=mysql_host,
-  user="app_user",
-  password="root"
+  user="<>",
+  password="<>"
 )
 
 print("Hello from docker!")
