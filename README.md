@@ -1,7 +1,7 @@
 # docker-experiments
 Repo to document all experiments with Docker
 
-# Docker Voulmes
+# Docker Volumes
 - Create mysql container without any volume, create db, stop container data check data
   
   ```docker run --platform linux/x86_64 -e MYSQL_ALLOW_EMPTY_PASSWORD=true -d mysql```
