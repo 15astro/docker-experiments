@@ -1,0 +1,16 @@
+version: "3.3"
+services:
+  python_app:
+    image: mysql-python-app-image
+    restart: on-failure
+    depends_on:
+      - mysql
+  mysql:
+    image: mysql:5.7
+    platform: linux/x86_64
+    restart: on-failure
+    environment: 
+      MYSQL_ROOT_PASSWORD: <>
+      MYSQL_DATABASE: <>
+      MYSQL_USER: <>
+      MYSQL_PASSWORD: <>
