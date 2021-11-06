@@ -51,5 +51,6 @@ Repo to document all experiments with Docker
 10. Add --init to add avoid pid 1 problem
 11. Use tagged images vs latest as latest may change
 12. Run with non-root. Use USER directive in dockerfile
+13. Use HEALTHCHECK directive within dockerfile for healthcheck
 
 
