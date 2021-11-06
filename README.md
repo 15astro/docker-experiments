@@ -38,3 +38,15 @@ Repo to document all experiments with Docker
 5. CI: build, run, test, push docker images to docker hub/docker registry
 6. Smoke test using application port checks 
 
+### Docker Best Practices:
+1. Use light images - base > slim > alpine
+2. Copy only required files to image
+3. Add .dockerignore 
+4. Use exact versions of packages when installing packages using apt
+5. Use COPY statements as late as possible in dockerfile - allows caching
+6. Add less changing statements earlier of dockerfile - allows caching
+7. Every RUN, COPY & ADD adds new layer. Add multiple RUN commands together
+8. Multistage build
+9. Add labels - git repo, maintainer build date, build #, git commit hash
+
+
