@@ -50,5 +50,6 @@ Repo to document all experiments with Docker
 9. Add labels - git repo, maintainer build date, build #, git commit hash
 10. Add --init to add avoid pid 1 problem
 11. Use tagged images vs latest as latest may change
+12. Run with non-root. Use USER directive in dockerfile
 
 
