@@ -49,5 +49,6 @@ Repo to document all experiments with Docker
 8. Multistage build
 9. Add labels - git repo, maintainer build date, build #, git commit hash
 10. Add --init to add avoid pid 1 problem
+11. Use tagged images vs latest as latest may change
 
 
