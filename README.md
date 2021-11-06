@@ -48,5 +48,6 @@ Repo to document all experiments with Docker
 7. Every RUN, COPY & ADD adds new layer. Add multiple RUN commands together
 8. Multistage build
 9. Add labels - git repo, maintainer build date, build #, git commit hash
+10. Add --init to add avoid pid 1 problem
 
 
