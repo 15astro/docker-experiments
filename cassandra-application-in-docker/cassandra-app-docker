@@ -1,0 +1,88 @@
+#Start by creating a Docker network. Click the following:
+docker network create cass-cluster-network
+
+#Click to pull an Apache Cassandra™ image from DockerHub.
+docker pull cassandra
+
+#Start the Cassandra node using the Docker network we created earlier.
+docker run -d --name nodeA --network cass-cluster-network cassandra
+
+#Click below to monitor the logs for nodeA.
+docker logs -f nodeA
+=================================================================================
+Pull the backend image from Docker Hub and run in a container
+In this step, you will pull a Spring microservice image from Docker Hub and run it in a Docker container. This microservice is a version of the Spring Pet Clinic sample customized to work with Cassandra.
+
+Start by clicking to pull the microservice from Docker Hub.
+
+docker pull datastaxdevs/petclinic-backend
+In order to run the microservice, you will need to specify the docker network and the environment variables necessary to connect to the Cassandra cluster. The last environment variable is a CQL command to create the keyspace in Cassandra. When the microservice starts it will create the required tables in the keyspace.
+
+Run the microservice in Docker.
+
+docker run -d \
+    --name backend \
+    --network cass-cluster-network \
+    -p 9966:9966 \
+    -e CASSANDRA_USE_ASTRA=false \
+    -e CASSANDRA_USER=cassandra \
+    -e CASSANDRA_PASSWORD=cassandra \
+    -e CASSANDRA_LOCAL_DC=datacenter1 \
+    -e CASSANDRA_CONTACT_POINTS=nodeA:9042 \
+    -e CASSANDRA_KEYSPACE_CQL="CREATE KEYSPACE spring_petclinic WITH REPLICATION = {'class':'SimpleStrategy','replication_factor':1};" \
+    datastaxdevs/petclinic-backend
+The Spring Boot backend exposes a RESTful API so we will use cURL to exercise it. The command below pipes the results to the jq pretty printer.
+
+Click the following to get all the pet types in the Cassandra database.
+
+Pro Tip: It may take a few minutes before the backend is up and running. Since this cURL command is idempotent you may run it multiple times until it works.
+
+curl -X GET "http://localhost:9966/petclinic/api/pettypes" -H "accept: application/json" | jq
+The world needs more unicorns! Click the following to add unicorn to the pet types.
+
+curl -X POST \
+   "http://localhost:9966/petclinic/api/pettypes" \
+   -H "accept: application/json" \
+   -H "Content-Type: application/json" \
+   -d "{ \"id\": \"unicorn\", \"name\": \"unicorn\"}" | jq
+Let's verify that unicorn has been added to the list of pettypes. This time we will use cqlsh to connect directly to the database and run a CQL query. Click the following to see the updated list of pettypes.
+
+docker exec -it nodeA cqlsh
+USE spring_petclinic;
+SELECT * FROM petclinic_reference_lists WHERE list_name='pet_type';
+QUIT;
+==============================================
+
+Pull the frontend image from Docker Hub and run in a container
+In this step, you will pull an Angular Web application image from Docker Hub and run it in a Docker container. This Web Application is a version of the Spring Pet Clinic frontend sample app customized to use a NodeJS server.
+
+Start by clicking to pull the Web application from Docker Hub.
+
+docker pull datastaxdevs/petclinic-frontend-nodejs
+Note: The microservice runs in the Katacoda environment. The frontend runs a NodeJS web server that downloads an Angular application to your browser. You will need to configure a special Katacoda URL to access the service remotely.
+
+Run the frontend. Set an environment variable to the Katacoda URL.
+
+docker run -d --name frontend -p 8080:8080 -e URL=https://2886795292-9966-indigo02.environments.katacoda.com datastaxdevs/petclinic-frontend-nodejs
+Connect to the Pet Clinic app using another tab in the browser.
+
+==============================================
+
+Shut down the Docker containers
+In this step, you will shutdown all three of the running containers. You should see nodeA (Cassandra), backend and frontend.
+
+Click to take clear the screen a look at the running containers.
+
+clear
+docker ps --format '{{.ID}}\t{{.Names}}\t{{.Image}}'
+Shut down all the runnning containers.
+
+docker stop $(docker ps -aq)
+Remove all the containers. This will remove the containers but not the images.
+
+docker rm $(docker ps -aq)
+Verify that the containers have been removed.
+
+docker ps --format '{{.ID}}\t{{.Names}}\t{{.Image}}'
+
+
