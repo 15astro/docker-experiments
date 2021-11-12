@@ -1,3 +1,5 @@
+Start Cassandra in docker
+
 #Start by creating a Docker network. Click the following:
 docker network create cass-cluster-network
 
@@ -10,6 +12,8 @@ docker run -d --name nodeA --network cass-cluster-network cassandra
 #Click below to monitor the logs for nodeA.
 docker logs -f nodeA
 =================================================================================
+Start Backend app in docker
+
 Pull the backend image from Docker Hub and run in a container
 In this step, you will pull a Spring microservice image from Docker Hub and run it in a Docker container. This microservice is a version of the Spring Pet Clinic sample customized to work with Cassandra.
 
@@ -53,6 +57,8 @@ SELECT * FROM petclinic_reference_lists WHERE list_name='pet_type';
 QUIT;
 ==============================================
 
+Start Frontend app in docker
+
 Pull the frontend image from Docker Hub and run in a container
 In this step, you will pull an Angular Web application image from Docker Hub and run it in a Docker container. This Web Application is a version of the Spring Pet Clinic frontend sample app customized to use a NodeJS server.
 
@@ -67,6 +73,8 @@ docker run -d --name frontend -p 8080:8080 -e URL=https://2886795292-9966-indigo
 Connect to the Pet Clinic app using another tab in the browser.
 
 ==============================================
+
+Tear down dockers cotaniners
 
 Shut down the Docker containers
 In this step, you will shutdown all three of the running containers. You should see nodeA (Cassandra), backend and frontend.
