@@ -1,0 +1,25 @@
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+
+
+helm install monitoring prometheus-community/kube-prometheus-stack -f config-values.yaml
+
+Configure Prometheus to Monitor Cassandra:
+
+kubectl apply -f prom_service_monitor.yaml
+
+
+Configure the Cassandra Grafana Dashboards:
+
+kubectl create -f dashboards_configmap.yaml
+
+Monitor the Pet Clinic App with Prometheus
+
+kubectl apply -f petclinic_service_monitor.yaml
+
+View the Pet Clinic App Metrics:
+
+cat dashboards_configmap.yaml petclinic_dashboard.yaml > updated_dashboard_configmap.yaml
+
+kubectl replace -f updated_dashboard_configmap.yaml
+
