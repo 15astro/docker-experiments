@@ -1,0 +1,57 @@
+Create a Kubernetes Cluster using Kind:
+
+kind create cluster --name cassandra-kub-cluster --config kind-config.yaml
+
+Check the cluster status:
+
+kubectl get nodes 
+
+Install an Ingress Controller:
+
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/kind/deploy.yaml
+
+Check if ingress-controller is initialized:
+
+kubectl wait --namespace ingress-nginx \
+  --for=condition=ready pod \
+  --selector=app.kubernetes.io/component=controller \
+  --timeout=90s
+
+Install the Cassandra Operator
+
+Create storage class:
+
+kubectl apply -f storageclass-kind.yaml
+
+Download datastax chart using Helm:
+
+helm repo add datastax https://datastax.github.io/charts
+helm repo update
+
+Install cass-operator from Datastax helm chart:
+
+helm install cass-operator datastax/cass-operator
+
+Wait for the operator to initialize:
+
+helm install cass-operator datastax/cass-operator
+
+Create a single node cassandra cluster:
+
+kubectl apply -f cassandra-cluster.yaml
+
+
+Wait for the cassandra cluster to initialize:
+
+kubectl wait \
+  --for=condition=Ready cassandradatacenter/dc1 \
+  --timeout=240s
+
+
+Deploy petclinic app:
+
+kubectl apply -f petclinic.yaml
+
+Check the petclinic backend apps:
+
+curl localhost:80/petclinic/api/pettypes | jq
