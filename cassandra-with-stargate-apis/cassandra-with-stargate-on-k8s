@@ -1,0 +1,71 @@
+Install Stargate
+
+kubectl apply -f stargate-config.yaml
+
+Extract the username and password created by cassandra operator
+
+# extract the username
+export CASS_USER=\
+$(kubectl get secret cluster1-superuser -o jsonpath="{.data.username}"\
+| base64 --decode)
+# extract the password
+export CASS_PASS=\
+$(kubectl get secret cluster1-superuser -o jsonpath="{.data.password}"\
+| base64 --decode)
+
+Get token
+curl -L -X POST 'http://localhost:80/v1/auth'    -H 'Content-Type: application/json'    --data-raw '{
+     "username": "'"$CASS_USER"'",
+     "password": "'"$CASS_PASS"'"
+ }' | jq
+
+
+Store auth_token as an environment variable
+
+export AUTH_TOKEN=$(curl -L -X POST 'http://localhost:80/v1/auth'    -H 'Content-Type: application/json'    --data-raw '{
+     "username": "'"$CASS_USER"'",
+     "password": "'"$CASS_PASS"'"
+ }' | jq -r '.authToken')
+
+
+Access stargate the REST API:
+curl -L -X GET \
+http://localhost:80/v2/keyspaces/spring_petclinic/petclinic_reference_lists/pet_type \
+--header "x-cassandra-token: ${AUTH_TOKEN}" | jq
+
+
+Update the pet types list:
+
+curl -L -X PUT \
+  http://localhost:80/v2/keyspaces/spring_petclinic/petclinic_reference_lists/pet_type \
+  --header "x-cassandra-token: ${AUTH_TOKEN}" \
+  --header 'content-type: application/json' \
+  --data '{"values":["bird","cat","dog","hamster","lizard","snake","unicorn"]}' | jq
+
+
+Access starget APIs using GraphQL:
+
+curl http://localhost:80/graphql/spring_petclinic \
+    --header "Accept-Encoding: gzip, deflate, br" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json" \
+    --header "Connection: keep-alive" \
+    --header "DNT: 1" \
+    --header "Origin: https://localhost" \
+    --header "x-cassandra-token: ${AUTH_TOKEN}" \
+    --data '{"query":"query petTypes {petclinic_reference_lists(value: {list_name: \"pet_type\"}) {values {values}}}"}' | jq
+
+Update the list of pet types using GraphQL:
+
+curl http://localhost:80/graphql/spring_petclinic \
+    --header "Accept-Encoding: gzip, deflate, br" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json" \
+    --header "Connection: keep-alive" \
+    --header "DNT: 1" \
+    --header "Origin: https://localhost" \
+    --header "x-cassandra-token: ${AUTH_TOKEN}" \
+    --data '{"query":"mutation updateListValues {listUpdate: updatepetclinic_reference_lists(value: { list_name: \"pet_type\", values: [\"bird\", \"cat\", \"dog\", \"hamster\", \"lizard\", \"snake\"] } ifExists: true) {value {list_name values}}}"}' | jq
+
+
+
