@@ -1,0 +1,15 @@
+version: "3.3"
+services:
+  postgresql:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 6432:5432
+    volumes:
+      - ./sql_data/northwind.sql:/docker-entrypoint-initdb.d/northwind.sql
+  jupyter_notebook:
+    image: jupyter/scipy-notebook
+    ports:
+      - 8888:8888
