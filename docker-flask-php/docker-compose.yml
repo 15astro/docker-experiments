@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+
+  product-api:
+      build: "./product-api"
+      volumes:
+      - "./product-api:/app"
+      ports:
+      - "8181:80"
+
+  frontend:
+     image: php:8.1-apache-buster
+     volumes:
+     - "./frontend:/var/www/html"
+     ports:
+     - "85:80"
+     depends_on:
+     - product-api
